@@ -14,7 +14,7 @@ COPY migrate/ ./migrate/
 
 RUN go mod download
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./booking_svc/cmd/booking_svc/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./booking_svc/cmd/booking_svc/*.go
 
 # Stage 2: Run
 FROM alpine

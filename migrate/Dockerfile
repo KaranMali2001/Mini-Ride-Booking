@@ -14,7 +14,7 @@ COPY migrate/ ./migrate/
 
 RUN go mod download
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./migrate
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./migrate/main.go
 
 # Stage 2: Run
 FROM alpine
@@ -23,6 +23,7 @@ WORKDIR /app
 
 COPY --from=builder /app/main .
 COPY migrate/.env .
+COPY migrate/migrations ./migrations
 EXPOSE 8080
 
 CMD ["./main"]

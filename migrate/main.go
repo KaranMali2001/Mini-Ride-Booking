@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	logger.Info("Inside Migration")
 	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		logger.Errorln("failed to open db: %v", err)
