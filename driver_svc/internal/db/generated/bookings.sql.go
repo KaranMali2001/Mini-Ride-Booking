@@ -12,13 +12,13 @@ import (
 )
 
 const getBookingByID = `-- name: GetBookingByID :one
-SELECT booking_id, pickuploc_lat, pickuploc_lng, dropoff_lat, dropoff_lng, price, ride_status, driver_id, created_at FROM bookings
+SELECT booking_id, pickuploc_lat, pickuploc_lng, dropoff_lat, dropoff_lng, price, ride_status, driver_id, created_at FROM booking.bookings
 WHERE booking_id = $1
 `
 
-func (q *Queries) GetBookingByID(ctx context.Context, bookingID pgtype.UUID) (Booking, error) {
+func (q *Queries) GetBookingByID(ctx context.Context, bookingID pgtype.UUID) (BookingBooking, error) {
 	row := q.db.QueryRow(ctx, getBookingByID, bookingID)
-	var i Booking
+	var i BookingBooking
 	err := row.Scan(
 		&i.BookingID,
 		&i.PickuplocLat,

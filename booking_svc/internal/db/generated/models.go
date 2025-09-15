@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type Booking struct {
+type BookingBooking struct {
 	BookingID    pgtype.UUID
 	PickuplocLat float64
 	PickuplocLng float64
@@ -20,14 +20,15 @@ type Booking struct {
 	CreatedAt    pgtype.Timestamptz
 }
 
-type Driver struct {
+type DriverDriver struct {
 	DriverID  pgtype.UUID
 	Name      string
 	Available bool
 	CreatedAt pgtype.Timestamptz
 }
 
-type Job struct {
+type DriverJob struct {
+	JobID        pgtype.UUID
 	BookingID    pgtype.UUID
 	DriverID     pgtype.UUID
 	RideStatus   string

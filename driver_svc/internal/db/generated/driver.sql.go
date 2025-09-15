@@ -12,13 +12,13 @@ import (
 )
 
 const getDriverByID = `-- name: GetDriverByID :one
-SELECT driver_id, name, available, created_at FROM drivers
+SELECT driver_id, name, available, created_at FROM driver.drivers
 WHERE driver_id = $1
 `
 
-func (q *Queries) GetDriverByID(ctx context.Context, driverID pgtype.UUID) (Driver, error) {
+func (q *Queries) GetDriverByID(ctx context.Context, driverID pgtype.UUID) (DriverDriver, error) {
 	row := q.db.QueryRow(ctx, getDriverByID, driverID)
-	var i Driver
+	var i DriverDriver
 	err := row.Scan(
 		&i.DriverID,
 		&i.Name,
@@ -29,18 +29,18 @@ func (q *Queries) GetDriverByID(ctx context.Context, driverID pgtype.UUID) (Driv
 }
 
 const getDrivers = `-- name: GetDrivers :many
-SELECT driver_id, name, available, created_at FROM drivers
+SELECT driver_id, name, available, created_at FROM driver.drivers
 `
 
-func (q *Queries) GetDrivers(ctx context.Context) ([]Driver, error) {
+func (q *Queries) GetDrivers(ctx context.Context) ([]DriverDriver, error) {
 	rows, err := q.db.Query(ctx, getDrivers)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Driver
+	var items []DriverDriver
 	for rows.Next() {
-		var i Driver
+		var i DriverDriver
 		if err := rows.Scan(
 			&i.DriverID,
 			&i.Name,
@@ -58,18 +58,18 @@ func (q *Queries) GetDrivers(ctx context.Context) ([]Driver, error) {
 }
 
 const updateDriver = `-- name: UpdateDriver :exec
-UPDATE jobs
-SET driver_id = $1, job_status = $2
+UPDATE driver.jobs
+SET driver_id = $1, ride_status = $2
 WHERE booking_id = $3
 `
 
 type UpdateDriverParams struct {
-	DriverID  pgtype.UUID
-	JobStatus string
-	BookingID pgtype.UUID
+	DriverID   pgtype.UUID
+	RideStatus string
+	BookingID  pgtype.UUID
 }
 
 func (q *Queries) UpdateDriver(ctx context.Context, arg UpdateDriverParams) error {
-	_, err := q.db.Exec(ctx, updateDriver, arg.DriverID, arg.JobStatus, arg.BookingID)
+	_, err := q.db.Exec(ctx, updateDriver, arg.DriverID, arg.RideStatus, arg.BookingID)
 	return err
 }

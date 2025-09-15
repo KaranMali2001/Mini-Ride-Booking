@@ -2,24 +2,28 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 
-	"github.com/KaranMali2001/mini-ride-booking/common/logger"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
 )
 
 func main() {
-	logger.Info("Inside Migration")
+	if err := godotenv.Load(); err != nil {
+		fmt.Println("WARNING: .env file not found")
+	}
+	fmt.Println("Inside Migation", os.Getenv("DATABASE_URL"))
 	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
-		logger.Errorln("failed to open db: %v", err)
+		fmt.Println("failed to open db", err)
 		return
 	}
 
 	if err := goose.Up(db, "./migrations"); err != nil {
-		logger.Errorln("goose up failed: %v", err)
+		fmt.Println("goose up failed", err)
 		return
 	}
-	logger.Info("Migration completed successfully")
+	fmt.Println("Migration completed successfully")
 }

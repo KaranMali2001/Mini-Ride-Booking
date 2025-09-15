@@ -17,12 +17,12 @@ type DriverRepo struct {
 func NewDriverRepo(q *generated.Queries) *DriverRepo {
 	return &DriverRepo{q: q}
 }
-func (r *DriverRepo) CreateJob(ctx context.Context, req models.CreateJobRequest) (generated.Job, error) {
+func (r *DriverRepo) CreateJob(ctx context.Context, req models.CreateJobRequest) (generated.DriverJob, error) {
 	params := generated.CreateJobParams{}
 	copier.Copy(&params, &req)
 	job, err := r.q.CreateJob(ctx, params)
 	if err != nil {
-		return generated.Job{}, err
+		return generated.DriverJob{}, err
 	}
 	return job, nil
 }
@@ -31,9 +31,9 @@ func (r *DriverRepo) UpdateDriver(ctx context.Context, req models.UpdateDriverRe
 	copier.Copy(&params, &req)
 	return r.q.UpdateDriver(ctx, params)
 }
-func (r *DriverRepo) GetJobByBookingId(ctx context.Context, bookingID pgtype.UUID) (generated.Job, error) {
+func (r *DriverRepo) GetJobByBookingId(ctx context.Context, bookingID pgtype.UUID) (generated.DriverJob, error) {
 	return r.q.GetJobByBookingId(ctx, bookingID)
 }
-func (r *DriverRepo) GetALlJobs(ctx context.Context) ([]generated.Job, error) {
+func (r *DriverRepo) GetALlJobs(ctx context.Context) ([]generated.DriverJob, error) {
 	return r.q.GetAllJobs(ctx)
 }

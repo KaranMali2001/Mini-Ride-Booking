@@ -15,6 +15,6 @@ type BookingService struct {
 func NewBookingService(repo *repo.BookingRepo) *BookingService {
 	return &BookingService{repo: repo}
 }
-func (s *BookingService) CreateBooking(ctx context.Context, req models.CreateBookingRequest) (generated.Booking, error) {
+func (s *BookingService) CreateBooking(ctx context.Context, req models.CreateBookingRequest) (generated.BookingBooking, error) {
 	return s.repo.CreateBooking(ctx, req)
 }

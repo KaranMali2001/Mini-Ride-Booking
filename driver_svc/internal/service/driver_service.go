@@ -37,6 +37,6 @@ func (s *DriverService) AcceptJob(ctx context.Context, req models.AcceptJobReque
 	}
 	return nil
 }
-func (s *DriverService) GetAllJobs(ctx context.Context) ([]generated.Job, error) {
+func (s *DriverService) GetAllJobs(ctx context.Context) ([]generated.DriverJob, error) {
 	return s.repo.GetALlJobs(ctx)
 }

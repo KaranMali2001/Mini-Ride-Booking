@@ -1,12 +1,12 @@
 
 -- name: UpdateDriver :exec
-UPDATE jobs
-SET driver_id = $1, job_status = $2
+UPDATE driver.jobs
+SET driver_id = $1, ride_status = $2
 WHERE booking_id = $3;
 
 -- name: GetDrivers :many
-SELECT * FROM drivers;
+SELECT * FROM driver.drivers;
 
 -- name: GetDriverByID :one
-SELECT * FROM drivers
+SELECT * FROM driver.drivers
 WHERE driver_id = $1;

@@ -1,15 +1,16 @@
 -- +goose Up
-CREATE TABLE IF NOT EXISTS bookings (
+CREATE SCHEMA IF NOT EXISTS booking;
+CREATE TABLE IF NOT EXISTS booking.bookings (
     booking_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     pickuploc_lat DOUBLE PRECISION NOT NULL,
     pickuploc_lng DOUBLE PRECISION NOT NULL,
     dropoff_lat DOUBLE PRECISION NOT NULL,
     dropoff_lng DOUBLE PRECISION NOT NULL,
     price INT NOT NULL,
-    ride_status TEXT NOT NULL,
+    ride_status TEXT NOT NULL CHECK (ride_status IN ('Requested','Accepted')),
     driver_id UUID NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- +goose Down
-DROP TABLE IF EXISTS bookings;
+DROP TABLE IF EXISTS booking.bookings;

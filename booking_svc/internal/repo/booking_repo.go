@@ -16,15 +16,15 @@ type BookingRepo struct {
 func NewBookingRepo(q *generated.Queries) *BookingRepo {
 	return &BookingRepo{q: q}
 }
-func (r *BookingRepo) CreateBooking(ctx context.Context, req models.CreateBookingRequest) (generated.Booking, error) {
+func (r *BookingRepo) CreateBooking(ctx context.Context, req models.CreateBookingRequest) (generated.BookingBooking, error) {
 	params := generated.CreateBookingParams{}
 	copier.Copy(&params, &req)
 	booking, err := r.q.CreateBooking(ctx, params)
 	if err != nil {
-		return generated.Booking{}, err
+		return generated.BookingBooking{}, err
 	}
 	return booking, nil
 }
-func (r *BookingRepo) GetBookingByID(ctx context.Context, bookingID pgtype.UUID) (generated.Booking, error) {
+func (r *BookingRepo) GetBookingByID(ctx context.Context, bookingID pgtype.UUID) (generated.BookingBooking, error) {
 	return r.q.GetBookingByID(ctx, bookingID)
 }

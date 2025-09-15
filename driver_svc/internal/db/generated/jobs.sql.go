@@ -12,57 +12,75 @@ import (
 )
 
 const createJob = `-- name: CreateJob :one
-INSERT INTO jobs (job_id, booking_id, driver_id, job_status)
-VALUES ($1, $2, $3, $4)
-RETURNING job_id, booking_id, driver_id, job_status, created_at, updated_at
+INSERT INTO driver.jobs (job_id, booking_id, driver_id, ride_status, pickuploc_lat, pickuploc_lng, dropoff_lat, dropoff_lng, price)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+RETURNING job_id, booking_id, driver_id, ride_status, pickuploc_lat, pickuploc_lng, dropoff_lat, dropoff_lng, price, created_at
 `
 
 type CreateJobParams struct {
-	JobID     pgtype.UUID
-	BookingID pgtype.UUID
-	DriverID  pgtype.UUID
-	JobStatus string
+	JobID        pgtype.UUID
+	BookingID    pgtype.UUID
+	DriverID     pgtype.UUID
+	RideStatus   string
+	PickuplocLat float64
+	PickuplocLng float64
+	DropoffLat   float64
+	DropoffLng   float64
+	Price        int32
 }
 
-func (q *Queries) CreateJob(ctx context.Context, arg CreateJobParams) (Job, error) {
+func (q *Queries) CreateJob(ctx context.Context, arg CreateJobParams) (DriverJob, error) {
 	row := q.db.QueryRow(ctx, createJob,
 		arg.JobID,
 		arg.BookingID,
 		arg.DriverID,
-		arg.JobStatus,
+		arg.RideStatus,
+		arg.PickuplocLat,
+		arg.PickuplocLng,
+		arg.DropoffLat,
+		arg.DropoffLng,
+		arg.Price,
 	)
-	var i Job
+	var i DriverJob
 	err := row.Scan(
 		&i.JobID,
 		&i.BookingID,
 		&i.DriverID,
-		&i.JobStatus,
+		&i.RideStatus,
+		&i.PickuplocLat,
+		&i.PickuplocLng,
+		&i.DropoffLat,
+		&i.DropoffLng,
+		&i.Price,
 		&i.CreatedAt,
-		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getAllJobs = `-- name: GetAllJobs :many
-SELECT job_id, booking_id, driver_id, job_status, created_at, updated_at FROM jobs
+SELECT job_id, booking_id, driver_id, ride_status, pickuploc_lat, pickuploc_lng, dropoff_lat, dropoff_lng, price, created_at FROM driver.jobs
 `
 
-func (q *Queries) GetAllJobs(ctx context.Context) ([]Job, error) {
+func (q *Queries) GetAllJobs(ctx context.Context) ([]DriverJob, error) {
 	rows, err := q.db.Query(ctx, getAllJobs)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Job
+	var items []DriverJob
 	for rows.Next() {
-		var i Job
+		var i DriverJob
 		if err := rows.Scan(
 			&i.JobID,
 			&i.BookingID,
 			&i.DriverID,
-			&i.JobStatus,
+			&i.RideStatus,
+			&i.PickuplocLat,
+			&i.PickuplocLng,
+			&i.DropoffLat,
+			&i.DropoffLng,
+			&i.Price,
 			&i.CreatedAt,
-			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -75,20 +93,24 @@ func (q *Queries) GetAllJobs(ctx context.Context) ([]Job, error) {
 }
 
 const getJobByBookingId = `-- name: GetJobByBookingId :one
-SELECT job_id, booking_id, driver_id, job_status, created_at, updated_at FROM jobs
+SELECT job_id, booking_id, driver_id, ride_status, pickuploc_lat, pickuploc_lng, dropoff_lat, dropoff_lng, price, created_at FROM driver.jobs
 WHERE booking_id = $1
 `
 
-func (q *Queries) GetJobByBookingId(ctx context.Context, bookingID pgtype.UUID) (Job, error) {
+func (q *Queries) GetJobByBookingId(ctx context.Context, bookingID pgtype.UUID) (DriverJob, error) {
 	row := q.db.QueryRow(ctx, getJobByBookingId, bookingID)
-	var i Job
+	var i DriverJob
 	err := row.Scan(
 		&i.JobID,
 		&i.BookingID,
 		&i.DriverID,
-		&i.JobStatus,
+		&i.RideStatus,
+		&i.PickuplocLat,
+		&i.PickuplocLng,
+		&i.DropoffLat,
+		&i.DropoffLng,
+		&i.Price,
 		&i.CreatedAt,
-		&i.UpdatedAt,
 	)
 	return i, err
 }
