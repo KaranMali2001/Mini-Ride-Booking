@@ -7,15 +7,16 @@ import (
 )
 
 func ConnectRabbit(url string) (*amqp.Connection, *amqp.Channel) {
+
 	conn, err := amqp.Dial(url)
 	if err != nil {
-		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
+		log.Fatalf("FATAL: RabbitMQ connection failed: %v", err)
 	}
-
 	ch, err := conn.Channel()
 	if err != nil {
-		log.Fatalf("Failed to open channel: %v", err)
+		log.Fatalf("FATAL: RabbitMQ channel creation failed: %v", err)
 	}
+	log.Println("RabbitMQ channel opened")
 
 	return conn, ch
 }

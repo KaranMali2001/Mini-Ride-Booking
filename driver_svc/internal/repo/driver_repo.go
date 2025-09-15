@@ -26,14 +26,30 @@ func (r *DriverRepo) CreateJob(ctx context.Context, req models.CreateJobRequest)
 	}
 	return job, nil
 }
-func (r *DriverRepo) UpdateDriver(ctx context.Context, req models.UpdateDriverRequest) error {
-	params := generated.UpdateDriverParams{}
-	copier.Copy(&params, &req)
-	return r.q.UpdateDriver(ctx, params)
-}
+
+//	func (r *DriverRepo) UpdateDriver(ctx context.Context, req models.UpdateDriverRequest) error {
+//		params := generated.UpdateDriverParams{}
+//		copier.Copy(&params, &req)
+//		return r.q.UpdateDriver(ctx, params)
+//	}
 func (r *DriverRepo) GetJobByBookingId(ctx context.Context, bookingID pgtype.UUID) (generated.DriverJob, error) {
 	return r.q.GetJobByBookingId(ctx, bookingID)
 }
 func (r *DriverRepo) GetALlJobs(ctx context.Context) ([]generated.DriverJob, error) {
 	return r.q.GetAllJobs(ctx)
+}
+
+func (r *DriverRepo) GetAllDrivers(ctx context.Context) ([]generated.DriverDriver, error) {
+	return r.q.GetDrivers(ctx)
+}
+
+func (r *DriverRepo) UpdateJobDriver(ctx context.Context, req models.UpdateJobDriverRequest) (generated.DriverJob, error) {
+	params := generated.UpdateJobDriverParams{}
+	copier.Copy(&params, &req)
+	return r.q.UpdateJobDriver(ctx, params)
+}
+func (r *DriverRepo) UpdateDriverStatus(ctx context.Context, req models.UpdateDriverRequest) error {
+	params := generated.UpdateDriverStatusParams{}
+	copier.Copy(&params, &req)
+	return r.q.UpdateDriverStatus(ctx, params)
 }

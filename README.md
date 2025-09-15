@@ -83,6 +83,70 @@ Manages driver operations including:
 
 Automatic database schema setup and migrations are handled by the migrate service.
 
+## API Endpoints
+
+### Booking Service (Port 8080)
+
+#### POST /bookings
+Create a new booking request.
+
+**Request:**
+```bash
+curl -X POST http://localhost:8080/bookings \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pickuploc": {"lat": 12.9, "lng": 77.6},
+    "dropoff": {"lat": 12.95, "lng": 77.64},
+    "price": 220
+  }'
+```
+
+**Response:** Returns 201 with full booking JSON including `booking_id`.
+
+#### GET /bookings
+Get all bookings (newest first).
+
+```bash
+curl http://localhost:8080/bookings
+```
+
+### Driver Service (Port 8081)
+
+#### GET /drivers
+List all available drivers.
+
+```bash
+curl http://localhost:8081/drivers
+```
+
+#### GET /jobs
+List currently unassigned bookings available to drivers.
+
+```bash
+curl http://localhost:8081/jobs
+```
+
+#### POST /jobs/{booking_id}/accept
+Driver accepts a specific job.
+
+```bash
+curl -X POST http://localhost:8081/jobs/<booking_id>/accept \
+  -H "Content-Type: application/json" \
+  -d '{"driver_id": "d-1"}'
+```
+
+**Note:** Replace `<booking_id>` with actual booking ID from booking creation.
+
+## Message Queue Integration
+
+The services communicate via RabbitMQ:
+
+- **booking.created**: Published by booking service when booking is created
+- **booking.accepted**: Published by driver service when driver accepts job, consumed by booking service
+
+**View Messages:**
+- RabbitMQ Management UI: http://localhost:15672 (guest/guest)
+
 ## Configuration
 
 Environment variables are managed through `.env` files:
@@ -101,3 +165,4 @@ The project uses a multi-service Docker setup with:
 - Individual service containers built from source
 
 All services are orchestrated through `deploy/docker-compose.yml` with proper dependency management and health checks.
+

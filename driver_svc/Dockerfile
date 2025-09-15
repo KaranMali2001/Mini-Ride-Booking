@@ -14,6 +14,9 @@ COPY migrate/ ./migrate/
 
 RUN go mod download
 
+# Run tests for driver service
+RUN go test ./driver_svc/internal/tests/... -v
+RUN echo "Tests passed"
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./driver_svc/cmd/driver_svc/*.go
 
 # Stage 2: Run

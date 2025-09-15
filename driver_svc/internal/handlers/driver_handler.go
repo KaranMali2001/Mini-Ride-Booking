@@ -44,3 +44,12 @@ func (h *DriverHandler) GetAllJobs(w http.ResponseWriter, r *http.Request) {
 	}
 	utils.SendJson(true, map[string]interface{}{"jobs": jobs}, nil, w)
 }
+
+func (h *DriverHandler) GetAllDrivers(w http.ResponseWriter, r *http.Request) {
+	drivers, err := h.DriverService.GetAllDrivers(r.Context())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	utils.SendJson(true, map[string]interface{}{"drivers": drivers}, nil, w)
+}

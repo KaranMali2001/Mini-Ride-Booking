@@ -1,7 +1,2 @@
--- name: GetBookingByID :one
-SELECT * FROM booking.bookings
-WHERE booking_id = $1;
-
-
-
-
+-- This file is for potential future booking-related queries in driver service
+-- Currently, driver service works with jobs table only

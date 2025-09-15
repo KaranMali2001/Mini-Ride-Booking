@@ -1,6 +1,6 @@
-
 -- +goose Up
 CREATE SCHEMA IF NOT EXISTS driver;
+
 CREATE TABLE IF NOT EXISTS driver.drivers (
     driver_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
@@ -22,6 +22,13 @@ CREATE TABLE IF NOT EXISTS driver.jobs (
     CONSTRAINT unique_booking_id UNIQUE (booking_id)
 );
 
+-- Seed initial drivers
+INSERT INTO driver.drivers (name, available) VALUES
+    ('Rajesh Kumar', TRUE),
+    ('Priya Sharma', TRUE),
+    ('Amit Verma', TRUE);
+
 -- +goose Down
 DROP TABLE IF EXISTS driver.jobs;
 DROP TABLE IF EXISTS driver.drivers;
+DROP SCHEMA IF EXISTS driver CASCADE;

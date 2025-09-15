@@ -9,22 +9,22 @@ import (
 )
 
 type BookingBooking struct {
-	BookingID    pgtype.UUID
-	PickuplocLat float64
-	PickuplocLng float64
-	DropoffLat   float64
-	DropoffLng   float64
-	Price        int32
-	RideStatus   string
-	DriverID     pgtype.UUID
-	CreatedAt    pgtype.Timestamptz
+	BookingID    pgtype.UUID        `json:"booking_id,omitempty"`
+	PickuplocLat float64            `json:"pickup_lat"`
+	PickuplocLng float64            `json:"pickup_lng"`
+	DropoffLat   float64            `json:"dropoff_lat"`
+	DropoffLng   float64            `json:"dropoff_lng"`
+	Price        int32              `json:"price,omitempty"`
+	RideStatus   string             `json:"ride_status,omitempty"`
+	DriverID     pgtype.UUID        `json:"driver_id,omitempty"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at,omitempty"`
 }
 
 type DriverDriver struct {
-	DriverID  pgtype.UUID
-	Name      string
-	Available bool
-	CreatedAt pgtype.Timestamptz
+	DriverID  pgtype.UUID        `json:"driver_id,omitempty"`
+	Name      string             `json:"name,omitempty"`
+	Available bool               `json:"available,omitempty"`
+	CreatedAt pgtype.Timestamptz `json:"created_at,omitempty"`
 }
 
 type DriverJob struct {

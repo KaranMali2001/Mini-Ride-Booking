@@ -12,38 +12,56 @@ import (
 )
 
 func main() {
+	log.Println("Starting Booking Service...")
+
 	// Load env
 	if err := godotenv.Load(); err != nil {
-		log.Println("WARNING: .env file not found")
+		log.Println(" WARNING: .env file not found, using defaults")
+	} else {
+
 	}
 
-	// Logger
 	isProd := os.Getenv("LOG_PROD") == "true"
 	_, logger, err := logger.Init(isProd)
 	if err != nil {
-		log.Fatal("ERROR while starting the logger", err)
+		log.Fatal("FATAL: Error while starting the logger:", err)
 		return
 	}
+	logger.Info("Logger initialized successfully")
 
-	// DB
 	_, queries, err := config.ConnectDb()
 	if err != nil {
-		log.Fatal("ERROR while connecting to database", err)
+		log.Fatal("FATAL: Error while connecting to database:", err)
 		return
 	}
+	logger.Info("Database connected successfully")
+
 	handler, err := bootstrapHandler(queries)
 	if err != nil {
-		log.Fatal("Failed to bootstrap handler:", err)
+		log.Fatal("FATAL: Failed to bootstrap handler:", err)
+		return
 	}
+	logger.Info("Handler bootstrapped successfully")
 
+	// Setup routes
+	logger.Info("Setting up routes...")
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
 
-	r.Post("/bookings", handler.CreateBooking) // POST
+	r.Post("/bookings", handler.CreateBooking)
+	r.Get("/bookings", handler.GetAllBookings)
+	logger.Info("Routes configured")
 
-	logger.Info("Booking Service Started on ", config.LoadConfig().Port)
-	if err := http.ListenAndServe(":"+config.LoadConfig().Port, r); err != nil {
-		logger.Error("HTTP server failed", err)
+	port := config.LoadConfig().Port
+	if port == "" {
+		port = "8080"
 	}
 
+	logger.Info("Booking Service Started successfully on port:", port)
+
+	if err := http.ListenAndServe(":"+port, r); err != nil {
+		logger.Error("HTTP server failed:", err)
+		return
+	}
 }

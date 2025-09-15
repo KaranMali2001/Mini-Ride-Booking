@@ -73,3 +73,19 @@ func (q *Queries) UpdateDriver(ctx context.Context, arg UpdateDriverParams) erro
 	_, err := q.db.Exec(ctx, updateDriver, arg.DriverID, arg.RideStatus, arg.BookingID)
 	return err
 }
+
+const updateDriverStatus = `-- name: UpdateDriverStatus :exec
+UPDATE driver.drivers
+SET available = $2
+WHERE driver_id = $1
+`
+
+type UpdateDriverStatusParams struct {
+	DriverID  pgtype.UUID
+	Available bool
+}
+
+func (q *Queries) UpdateDriverStatus(ctx context.Context, arg UpdateDriverStatusParams) error {
+	_, err := q.db.Exec(ctx, updateDriverStatus, arg.DriverID, arg.Available)
+	return err
+}

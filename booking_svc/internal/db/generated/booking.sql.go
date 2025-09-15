@@ -13,15 +13,14 @@ import (
 
 const createBooking = `-- name: CreateBooking :one
 INSERT INTO booking.bookings (
-    booking_id, pickuploc_lat, pickuploc_lng, dropoff_lat, dropoff_lng, price, ride_status, driver_id, created_at
+     pickuploc_lat, pickuploc_lng, dropoff_lat, dropoff_lng, price, ride_status, driver_id
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9
+    $1, $2, $3, $4, $5, $6, $7
 )
 RETURNING booking_id, pickuploc_lat, pickuploc_lng, dropoff_lat, dropoff_lng, price, ride_status, driver_id, created_at
 `
 
 type CreateBookingParams struct {
-	BookingID    pgtype.UUID
 	PickuplocLat float64
 	PickuplocLng float64
 	DropoffLat   float64
@@ -29,12 +28,10 @@ type CreateBookingParams struct {
 	Price        int32
 	RideStatus   string
 	DriverID     pgtype.UUID
-	CreatedAt    pgtype.Timestamptz
 }
 
 func (q *Queries) CreateBooking(ctx context.Context, arg CreateBookingParams) (BookingBooking, error) {
 	row := q.db.QueryRow(ctx, createBooking,
-		arg.BookingID,
 		arg.PickuplocLat,
 		arg.PickuplocLng,
 		arg.DropoffLat,
@@ -42,7 +39,6 @@ func (q *Queries) CreateBooking(ctx context.Context, arg CreateBookingParams) (B
 		arg.Price,
 		arg.RideStatus,
 		arg.DriverID,
-		arg.CreatedAt,
 	)
 	var i BookingBooking
 	err := row.Scan(
@@ -57,6 +53,41 @@ func (q *Queries) CreateBooking(ctx context.Context, arg CreateBookingParams) (B
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const getAllBookings = `-- name: GetAllBookings :many
+SELECT booking_id, pickuploc_lat, pickuploc_lng, dropoff_lat, dropoff_lng, price, ride_status, driver_id, created_at FROM booking.bookings
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetAllBookings(ctx context.Context) ([]BookingBooking, error) {
+	rows, err := q.db.Query(ctx, getAllBookings)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []BookingBooking
+	for rows.Next() {
+		var i BookingBooking
+		if err := rows.Scan(
+			&i.BookingID,
+			&i.PickuplocLat,
+			&i.PickuplocLng,
+			&i.DropoffLat,
+			&i.DropoffLng,
+			&i.Price,
+			&i.RideStatus,
+			&i.DriverID,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getBookingByID = `-- name: GetBookingByID :one
@@ -79,4 +110,21 @@ func (q *Queries) GetBookingByID(ctx context.Context, bookingID pgtype.UUID) (Bo
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const updateBookingStatus = `-- name: UpdateBookingStatus :exec
+UPDATE booking.bookings
+SET ride_status = $2, driver_id = $3
+WHERE booking_id = $1
+`
+
+type UpdateBookingStatusParams struct {
+	BookingID  pgtype.UUID
+	RideStatus string
+	DriverID   pgtype.UUID
+}
+
+func (q *Queries) UpdateBookingStatus(ctx context.Context, arg UpdateBookingStatusParams) error {
+	_, err := q.db.Exec(ctx, updateBookingStatus, arg.BookingID, arg.RideStatus, arg.DriverID)
+	return err
 }

@@ -12,13 +12,12 @@ import (
 )
 
 const createJob = `-- name: CreateJob :one
-INSERT INTO driver.jobs (job_id, booking_id, driver_id, ride_status, pickuploc_lat, pickuploc_lng, dropoff_lat, dropoff_lng, price)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+INSERT INTO driver.jobs (booking_id, driver_id, ride_status, pickuploc_lat, pickuploc_lng, dropoff_lat, dropoff_lng, price)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING job_id, booking_id, driver_id, ride_status, pickuploc_lat, pickuploc_lng, dropoff_lat, dropoff_lng, price, created_at
 `
 
 type CreateJobParams struct {
-	JobID        pgtype.UUID
 	BookingID    pgtype.UUID
 	DriverID     pgtype.UUID
 	RideStatus   string
@@ -31,7 +30,6 @@ type CreateJobParams struct {
 
 func (q *Queries) CreateJob(ctx context.Context, arg CreateJobParams) (DriverJob, error) {
 	row := q.db.QueryRow(ctx, createJob,
-		arg.JobID,
 		arg.BookingID,
 		arg.DriverID,
 		arg.RideStatus,
@@ -99,6 +97,37 @@ WHERE booking_id = $1
 
 func (q *Queries) GetJobByBookingId(ctx context.Context, bookingID pgtype.UUID) (DriverJob, error) {
 	row := q.db.QueryRow(ctx, getJobByBookingId, bookingID)
+	var i DriverJob
+	err := row.Scan(
+		&i.JobID,
+		&i.BookingID,
+		&i.DriverID,
+		&i.RideStatus,
+		&i.PickuplocLat,
+		&i.PickuplocLng,
+		&i.DropoffLat,
+		&i.DropoffLng,
+		&i.Price,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const updateJobDriver = `-- name: UpdateJobDriver :one
+UPDATE driver.jobs
+SET driver_id = $2, ride_status = $3
+WHERE booking_id = $1
+RETURNING job_id, booking_id, driver_id, ride_status, pickuploc_lat, pickuploc_lng, dropoff_lat, dropoff_lng, price, created_at
+`
+
+type UpdateJobDriverParams struct {
+	BookingID  pgtype.UUID
+	DriverID   pgtype.UUID
+	RideStatus string
+}
+
+func (q *Queries) UpdateJobDriver(ctx context.Context, arg UpdateJobDriverParams) (DriverJob, error) {
+	row := q.db.QueryRow(ctx, updateJobDriver, arg.BookingID, arg.DriverID, arg.RideStatus)
 	var i DriverJob
 	err := row.Scan(
 		&i.JobID,

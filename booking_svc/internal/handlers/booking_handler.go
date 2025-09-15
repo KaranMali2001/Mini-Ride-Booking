@@ -36,5 +36,15 @@ func (h *BookingHandler) CreateBooking(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	w.WriteHeader(http.StatusCreated)
 	utils.SendJson(true, map[string]interface{}{"booking": booking}, nil, w)
+}
+
+func (h *BookingHandler) GetAllBookings(w http.ResponseWriter, r *http.Request) {
+	bookings, err := h.bookingService.GetAllBookings(r.Context())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	utils.SendJson(true, map[string]interface{}{"bookings": bookings}, nil, w)
 }

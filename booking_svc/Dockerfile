@@ -14,6 +14,10 @@ COPY migrate/ ./migrate/
 
 RUN go mod download
 
+# Run tests for booking service
+RUN go test ./booking_svc/internal/tests/... -v
+RUN echo "Tests passed"
+
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./booking_svc/cmd/booking_svc/*.go
 
 # Stage 2: Run
